@@ -14,5 +14,5 @@ my_help.o : my_help.c
 	$(CC) -c -o $@ $^
 
 clean : 
-	rm -rf $(TARGET)
+	rm -rf $(TARGET) $(TARGET).o
 	rm -rf $(OBJECTS)
