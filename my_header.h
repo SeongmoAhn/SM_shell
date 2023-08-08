@@ -17,9 +17,10 @@ char execPath[PATH_MAX];
 char homePath[PATH_MAX];
 char execName[PATH_MAX];
 
-char *commandList[2] = {
+char *commandList[3] = {
     "exit",
-    "help"
+    "help",
+    "pwd"
 };
 
 void help();

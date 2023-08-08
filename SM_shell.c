@@ -32,14 +32,15 @@ void prompt() {
         fgets(input, STR_MAX, stdin);
         input[strlen(input) - 1] = '\0';
 
-        // strcpy(execName, input);
-
         if (!strcmp(input, commandList[0])) { // exit
             fprintf(stdout, "* SM_shell exit... *\n");
             exit(0);
         } else if (!strcmp(input, commandList[1])) { // help
             command = CMD_HELP;
-        } 
+        } else if (!strcmp(input, commandList[2])) {
+            printf("%s\n\n", execPath);
+            continue;
+        }
         else {
             command = NOT_CMD;
         }
