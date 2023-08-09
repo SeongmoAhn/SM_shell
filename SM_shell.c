@@ -48,6 +48,11 @@ void prompt() {
         fgets(input, STR_MAX, stdin);
         input[strlen(input) - 1] = '\0';
 
+        if (!strcmp(input, "clear")) {
+            system("clear");
+            continue;
+        }
+
         if (!strcmp(input, commandList[0])) { // exit
             fprintf(stdout, "* SM_shell exit... *\n");
             exit(0);
