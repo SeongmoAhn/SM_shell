@@ -11,6 +11,7 @@ typedef struct _node {
 } Node;
 
 Node *head = NULL;
+int maxLength = -1;
 
 void addNode(Node *newNode) {
     if (head == NULL) {
@@ -34,11 +35,18 @@ void deleteNode() {
     }
 }
 
-void ls() {
+Node *createNode(char *fname) {
+    Node *ret = (Node *)malloc(sizeof(Node));
+    ret->next = NULL;
+    ret->fileName = fname;
+
+    return ret;
+}
+
+void makeList() {
     DIR *dp;
     struct dirent *entry;
     struct stat statbuf;
-    int maxLength = -1;
 
     if ((dp = opendir(".")) == NULL) {
         fprintf(stderr, "opendir error\n");
@@ -51,17 +59,20 @@ void ls() {
             exit(1);
         }
 
-        Node *newNode = (Node *)malloc(sizeof(Node));
-        newNode->fileName = entry->d_name;
-        newNode->next = NULL;
+        Node *newNode = createNode(entry->d_name);
         addNode(newNode);
-        
         if ((int)strlen(newNode->fileName) > maxLength)
             maxLength = (int)strlen(newNode->fileName);
     }
 
-    Node *cur = head;
     maxLength++;
+    closedir(dp);
+}
+
+void ls() {
+    makeList();
+
+    Node *cur = head;
     int cnt = 0;
     while (cur != NULL) {
         if (cur->fileName[0] == '.') {
@@ -81,6 +92,4 @@ void ls() {
 
     deleteNode();
     printf("\n\n");
-
-    closedir(dp);
 }
