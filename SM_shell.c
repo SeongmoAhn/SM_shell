@@ -17,6 +17,22 @@ void helpExec() {
     }
 }
 
+void lsExec() {
+    pid_t pid;
+
+    if ((pid = fork()) < 0) {
+        fprintf(stderr, "fork error\n");
+        exit(1);
+    }
+    else if (pid == 0) {
+        execl(execName, "ls", (char *)0);
+        exit(0);
+    }
+    else {
+        pid = wait(NULL);
+    }
+}
+
 void init() {
     getcwd(execPath, PATH_MAX);
     sprintf(homePath, "%s", getenv("HOME"));
@@ -39,7 +55,10 @@ void prompt() {
             command = CMD_HELP;
         } else if (!strcmp(input, commandList[2])) {
             printf("%s\n\n", execPath);
+            command = CMD_PWD;
             continue;
+        } else if (!strcmp(input, commandList[3])) {
+            command = CMD_LS;
         }
         else {
             command = NOT_CMD;
@@ -47,6 +66,8 @@ void prompt() {
 
         if (command & CMD_HELP || command == NOT_CMD) {
             helpExec();
+        } else if (command & CMD_LS) {
+            lsExec();
         }
     }
 }
@@ -58,6 +79,8 @@ int main(int argc, char **argv) {
 
     if (!strcmp(argv[0], "help")) {
         help();
+    } else if(!strcmp(argv[0], "ls")) {
+        ls();
     }
     else {
         prompt();
