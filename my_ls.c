@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
+#include <fcntl.h>
 #include <sys/stat.h>
 #include <dirent.h>
 
@@ -12,6 +14,7 @@ typedef struct _node {
 
 Node *head = NULL;
 int maxLength = -1;
+int terminalWidth = 0;
 
 void addNode(Node *newNode) {
     if (head == NULL) {
@@ -69,26 +72,76 @@ void makeList() {
     closedir(dp);
 }
 
-void ls() {
-    makeList();
+void getTerminalWidth(char *output) {
+    int fd;
+    pid_t pid;
+    char buf[1024];
+    int length;
 
-    Node *cur = head;
+    if ((fd = open(output, O_WRONLY | O_CREAT | O_TRUNC, 0644)) < 0) {
+        fprintf(stderr, "open error\n");
+        exit(1);
+    }
+
+    if ((pid = fork()) < 0) {
+        fprintf(stderr, "fork error\n");
+        exit(1);
+    }
+    else if (pid == 0) {
+        dup2(fd, STDOUT_FILENO);
+        execl("/bin/stty", "stty", "size", (char *)0);
+        close(fd);
+
+        exit(0);
+    }
+    else {
+        pid = wait(NULL);
+    }
+
+    if ((fd = open(output, O_RDONLY)) < 0) {
+        fprintf(stderr, "open error\n");
+        exit(1);
+    }
+
+    read(fd, buf, 1024);
+    buf[strlen(buf) - 1] = '\0';
+    int i = 0;
+    while (buf[i] != ' ') i++;
+    while (buf[++i] != '\0') {
+        terminalWidth = terminalWidth * 10 + (buf[i] - '0');
+    }
+
+    if (remove(output) < 0) {
+        fprintf(stderr, "remove error\n");
+        exit(1);
+    }
+    close(fd);
+}
+
+void printList() {
+    int wordPerLine = terminalWidth / maxLength;
+    if (wordPerLine > 10) wordPerLine = 10;
+
     int cnt = 0;
-    while (cur != NULL) {
+    for (Node *cur = head; cur != NULL; cur = cur->next) {
         if (cur->fileName[0] == '.') {
             cur = cur->next;
             continue;
         }
         int tab = maxLength - (int)strlen(cur->fileName);
         printf("%s", cur->fileName);
-        for (int i = 0; i < tab; i++) {
-            printf(" ");
-        }
-        cur = cur->next;
+        for (int i = 0; i < tab; i++) printf(" ");
         cnt++;
-        if (cnt % 8 == 0)
-            printf("\n");
+        if (cnt % wordPerLine == 0) printf("\n");
     }
+
+}
+
+void ls() {
+    makeList();
+    getTerminalWidth("termWidth.txt");
+
+    printList();
 
     deleteNode();
     printf("\n\n");
