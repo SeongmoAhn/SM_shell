@@ -14,6 +14,7 @@
 typedef struct _node {
     char *fileName;
     struct _node *next;
+    struct stat statbuf;
 } Node;
 
 Node *head = NULL;
@@ -67,6 +68,7 @@ void makeList() {
         }
 
         Node *newNode = createNode(entry->d_name);
+        newNode->statbuf = statbuf;
         addNode(newNode);
         if ((int)strlen(newNode->fileName) > maxLength)
             maxLength = (int)strlen(newNode->fileName);
@@ -122,14 +124,51 @@ void getTerminalWidth(char *output) {
     close(fd);
 }
 
+char *checkAccess(struct stat statbuf) {
+    char temp[12] = "----------@";
+    char *ret = (char *)malloc(sizeof(temp));
+
+    if (S_ISDIR(statbuf.st_mode))
+        temp[0] = 'd';
+
+    if (statbuf.st_mode & S_IRUSR) temp[1] = 'r';
+    if (statbuf.st_mode & S_IWUSR) temp[2] = 'w';
+    if (statbuf.st_mode & S_IXUSR) temp[3] = 'x';
+    if (statbuf.st_mode & S_IRGRP) temp[4] = 'r';
+    if (statbuf.st_mode & S_IWGRP) temp[5] = 'w';
+    if (statbuf.st_mode & S_IXGRP) temp[6] = 'x';
+    if (statbuf.st_mode & S_IROTH) temp[7] = 'r';
+    if (statbuf.st_mode & S_IWOTH) temp[8] = 'w';
+    if (statbuf.st_mode & S_IXOTH) temp[9] = 'x';
+
+    strcpy(ret, temp);
+
+    return ret;
+}
+
 void printList(int opt) {
+    char *accessStr = NULL;
+    for (Node *cur = head; cur != NULL; cur = cur->next) {
+        if (!(opt & OPT_A) && cur->fileName[0] == '.') {
+            continue;
+        }
+        accessStr = checkAccess(cur->statbuf);
+        printf("%s%6lld %s\n", accessStr, cur->statbuf.st_size, cur->fileName);
+    }
+}
+
+void printFiles(int opt) {
+    if (opt & OPT_L) {
+        printList(opt);
+        return ;
+    }
+
     int wordPerLine = terminalWidth / maxLength;
     if (wordPerLine > 10) wordPerLine = 10;
 
     int cnt = 0;
     for (Node *cur = head; cur != NULL; cur = cur->next) {
         if (!(opt & OPT_A) && cur->fileName[0] == '.') {
-            cur = cur->next;
             continue;
         }
         int tab = maxLength - (int)strlen(cur->fileName);
@@ -138,20 +177,21 @@ void printList(int opt) {
         cnt++;
         if (cnt % wordPerLine == 0) printf("\n");
     }
+    printf("\n");
 }
 
 void ls(int argc, char **argv) {
     int opt = 0b00000;
     int cmd;
-    while ((cmd = getopt(argc, argv, "a")) != -1) {
+    while ((cmd = getopt(argc, argv, "al")) != -1) {
         switch(cmd) {
             case 'a':
                 opt |= OPT_A;
                 break;
-            //
-            // case 'l':
-            //     opt |= OPT_L;
-            //     break;
+
+            case 'l':
+                opt |= OPT_L;
+                break;
             //
             // case 'i':
             //     opt |= OPT_I;
@@ -165,8 +205,8 @@ void ls(int argc, char **argv) {
     makeList();
     getTerminalWidth("termWidth.txt");
 
-    printList(opt);
+    printFiles(opt);
 
     deleteNode();
-    printf("\n\n");
+    printf("\n");
 }
