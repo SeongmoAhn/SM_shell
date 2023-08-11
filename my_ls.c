@@ -7,6 +7,10 @@
 #include <sys/stat.h>
 #include <dirent.h>
 
+#define OPT_A 0b00001
+#define OPT_L 0b00010
+#define OPT_I 0b00100
+
 typedef struct _node {
     char *fileName;
     struct _node *next;
@@ -118,13 +122,13 @@ void getTerminalWidth(char *output) {
     close(fd);
 }
 
-void printList() {
+void printList(int opt) {
     int wordPerLine = terminalWidth / maxLength;
     if (wordPerLine > 10) wordPerLine = 10;
 
     int cnt = 0;
     for (Node *cur = head; cur != NULL; cur = cur->next) {
-        if (cur->fileName[0] == '.') {
+        if (!(opt & OPT_A) && cur->fileName[0] == '.') {
             cur = cur->next;
             continue;
         }
@@ -134,14 +138,34 @@ void printList() {
         cnt++;
         if (cnt % wordPerLine == 0) printf("\n");
     }
-
 }
 
 void ls(int argc, char **argv) {
+    int opt = 0b00000;
+    int cmd;
+    while ((cmd = getopt(argc, argv, "a")) != -1) {
+        switch(cmd) {
+            case 'a':
+                opt |= OPT_A;
+                break;
+            //
+            // case 'l':
+            //     opt |= OPT_L;
+            //     break;
+            //
+            // case 'i':
+            //     opt |= OPT_I;
+            //     break;
+            //
+            case '?':
+                printf("Unknown flag : %c\n", optopt);
+                break;
+        }
+    }
     makeList();
     getTerminalWidth("termWidth.txt");
 
-    printList();
+    printList(opt);
 
     deleteNode();
     printf("\n\n");
