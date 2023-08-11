@@ -28,3 +28,22 @@ char *commandList[4] = {
 
 void help();
 void ls();
+
+char **divideString(char *str, int *cnt, char *del) {
+    *cnt = 0;
+    char *tempList[100] = {(char *)NULL, };
+    char **retList = (char **)malloc(sizeof(char *) * (*cnt + 1));
+    char *token = NULL;
+
+    token = strtok(str, del);
+    if (token == NULL) return NULL;
+    while (token != NULL) {
+        tempList[(*cnt)++] = token;
+        token = strtok(NULL, del);
+    }
+
+    for (int i = 0; i < *cnt; i++) {
+         retList[i] = tempList[i];
+    }
+    return retList;
+}
