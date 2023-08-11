@@ -17,7 +17,7 @@ void helpExec() {
     }
 }
 
-void lsExec() {
+void lsExec(char **argList) {
     pid_t pid;
 
     if ((pid = fork()) < 0) {
@@ -25,7 +25,7 @@ void lsExec() {
         exit(1);
     }
     else if (pid == 0) {
-        execl(execName, "ls", (char *)0);
+        execv(execName, argList);
         exit(0);
     }
     else {
@@ -41,12 +41,17 @@ void init() {
 void prompt() {
     char input[STR_MAX];
     int command;
+    int argCnt;
+    char **argList = NULL;
 
     while (1) {
         printf("SM_shell > ");
         
         fgets(input, STR_MAX, stdin);
         input[strlen(input) - 1] = '\0';
+        if ((argList = divideString(input, &argCnt, " \t")) == NULL) {
+            continue;
+        }
 
         if (!strcmp(input, "clear")) {
             system("clear");
@@ -56,13 +61,13 @@ void prompt() {
         if (!strcmp(input, commandList[0])) { // exit
             fprintf(stdout, "* SM_shell exit... *\n");
             exit(0);
-        } else if (!strcmp(input, commandList[1])) { // help
+        } else if (!strcmp(argList[0], commandList[1])) { // help
             command = CMD_HELP;
-        } else if (!strcmp(input, commandList[2])) {
+        } else if (!strcmp(argList[0], commandList[2])) {
             printf("%s\n\n", execPath);
             command = CMD_PWD;
             continue;
-        } else if (!strcmp(input, commandList[3])) {
+        } else if (!strcmp(argList[0], commandList[3])) {
             command = CMD_LS;
         }
         else {
@@ -72,7 +77,7 @@ void prompt() {
         if (command & CMD_HELP || command == NOT_CMD) {
             helpExec();
         } else if (command & CMD_LS) {
-            lsExec();
+            lsExec(argList);
         }
     }
 }
@@ -85,7 +90,7 @@ int main(int argc, char **argv) {
     if (!strcmp(argv[0], "help")) {
         help();
     } else if(!strcmp(argv[0], "ls")) {
-        ls();
+        ls(argc, argv);
     }
     else {
         prompt();

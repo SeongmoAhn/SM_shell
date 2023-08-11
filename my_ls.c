@@ -137,7 +137,7 @@ void printList() {
 
 }
 
-void ls() {
+void ls(int argc, char **argv) {
     makeList();
     getTerminalWidth("termWidth.txt");
 

@@ -27,7 +27,7 @@ char *commandList[4] = {
 };
 
 void help();
-void ls();
+void ls(int, char **);
 
 char **divideString(char *str, int *cnt, char *del) {
     *cnt = 0;
