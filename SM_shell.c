@@ -59,7 +59,6 @@ void vimExec(char **argList) {
 }
 
 void cdExec(int argCnt, char **argList) {
-    printf("%s -> ", execPath);
     if (argCnt == 1) {
         if (chdir(homePath) < 0) {
             fprintf(stderr, "chdir error\n");
@@ -69,12 +68,11 @@ void cdExec(int argCnt, char **argList) {
     }
     else {
         if (chdir(argList[1]) < 0) {
-            fprintf(stderr, "chdir error\n");
-            exit(1);
+            fprintf(stderr, "%s is not exist.\n\n", argList[1]);
+            return ;
         }
         getcwd(execPath, PATH_MAX);
     }
-    printf("%s\n\n", execPath);
 }
 
 void init() {
