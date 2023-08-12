@@ -52,6 +52,25 @@ void vimExec(char **argList) {
     printf("\n");
 }
 
+void cdExec(int argCnt, char **argList) {
+    printf("%s -> ", execPath);
+    if (argCnt == 1) {
+        if (chdir(homePath) < 0) {
+            fprintf(stderr, "chdir error\n");
+            exit(1);
+        }
+        getcwd(execPath, PATH_MAX);
+    }
+    else {
+        if (chdir(argList[1]) < 0) {
+            fprintf(stderr, "chdir error\n");
+            exit(1);
+        }
+        getcwd(execPath, PATH_MAX);
+    }
+    printf("%s\n\n", execPath);
+}
+
 void init() {
     getcwd(execPath, PATH_MAX);
     sprintf(homePath, "%s", getenv("HOME"));
@@ -59,7 +78,7 @@ void init() {
 
 void prompt() {
     char input[STR_MAX];
-    int command;
+    int command = NOT_CMD;
     int argCnt;
     char **argList = NULL;
 
@@ -90,6 +109,8 @@ void prompt() {
             command = CMD_LS;
         } else if (!strcmp(argList[0], commandList[4]) || !strcmp(argList[0], commandList[5])) { // vim
             command = CMD_VIM;
+        } else if (!strcmp(argList[0], commandList[6])) { // cd
+            command = CMD_CD;
         }
         else command = NOT_CMD;
 
@@ -99,6 +120,8 @@ void prompt() {
             lsExec(argList);
         } else if (command & CMD_VIM) {
             vimExec(argList);
+        } else if (command & CMD_CD) {
+            cdExec(argCnt, argList);
         }
     }
 }

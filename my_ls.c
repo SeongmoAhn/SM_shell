@@ -55,8 +55,10 @@ void makeList() {
     DIR *dp;
     struct dirent *entry;
     struct stat statbuf;
+    char execPath[1024];
+    getcwd(execPath, 1024);
 
-    if ((dp = opendir(".")) == NULL) {
+    if ((dp = opendir(execPath)) == NULL) {
         fprintf(stderr, "opendir error\n");
         exit(1);
     }
@@ -202,6 +204,7 @@ void ls(int argc, char **argv) {
                 break;
         }
     }
+    char temp[1024];
     makeList();
     getTerminalWidth("termWidth.txt");
 
