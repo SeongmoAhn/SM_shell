@@ -14,20 +14,26 @@
 #define CMD_HELP 0b0000010
 #define CMD_PWD  0b0000100
 #define CMD_LS   0b0001000
+#define CMD_VIM  0b0010000
+#define CMD_CD   0b0100000
 
 char execPath[PATH_MAX];
 char homePath[PATH_MAX];
 char execName[PATH_MAX];
 
-char *commandList[4] = {
+char *commandList[7] = {
     "exit",
     "help",
     "pwd",
-    "ls"
+    "ls",
+    "vim",
+    "vi",
+    "cd"
 };
 
 void help();
 void ls(int, char **);
+void vim(int, char **);
 
 char **divideString(char *str, int *cnt, char *del) {
     *cnt = 0;

@@ -33,6 +33,25 @@ void lsExec(char **argList) {
     }
 }
 
+void vimExec(char **argList) {
+    pid_t pid;
+    char path[PATH_MAX];
+    sprintf(path, "/usr/bin/%s", argList[0]);
+
+    if ((pid = fork()) < 0) {
+        fprintf(stderr, "fork error\n");
+        exit(1);
+    }
+    else if (pid == 0) {
+        execv(path, argList);
+        exit(0);
+    }
+    else {
+        pid = wait(NULL);
+    }
+    printf("\n");
+}
+
 void init() {
     getcwd(execPath, PATH_MAX);
     sprintf(homePath, "%s", getenv("HOME"));
@@ -63,21 +82,23 @@ void prompt() {
             exit(0);
         } else if (!strcmp(argList[0], commandList[1])) { // help
             command = CMD_HELP;
-        } else if (!strcmp(argList[0], commandList[2])) {
+        } else if (!strcmp(argList[0], commandList[2])) { // pwd
             printf("%s\n\n", execPath);
             command = CMD_PWD;
             continue;
-        } else if (!strcmp(argList[0], commandList[3])) {
+        } else if (!strcmp(argList[0], commandList[3])) { // ls
             command = CMD_LS;
+        } else if (!strcmp(argList[0], commandList[4]) || !strcmp(argList[0], commandList[5])) { // vim
+            command = CMD_VIM;
         }
-        else {
-            command = NOT_CMD;
-        }
+        else command = NOT_CMD;
 
         if (command & CMD_HELP || command == NOT_CMD) {
             helpExec();
         } else if (command & CMD_LS) {
             lsExec(argList);
+        } else if (command & CMD_VIM) {
+            vimExec(argList);
         }
     }
 }
