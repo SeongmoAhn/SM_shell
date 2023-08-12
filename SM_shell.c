@@ -136,9 +136,7 @@ int main(int argc, char **argv) {
     } else if(!strcmp(argv[0], "ls")) {
         ls(argc, argv);
     }
-    else {
-        prompt();
-    }
+    else prompt();
 
     exit(0);
 }
