@@ -19,6 +19,7 @@
 
 char execPath[PATH_MAX];
 char homePath[PATH_MAX];
+char *codePath = "/Users/asm/code/sysp/makeShell/";
 char execName[PATH_MAX];
 
 char *commandList[7] = {

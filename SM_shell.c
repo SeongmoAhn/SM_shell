@@ -3,13 +3,16 @@
 
 void helpExec() {
     pid_t pid;
+    char path[PATH_MAX] = "";
+    strcat(path, codePath);
+    strcat(path, execName);
 
     if ((pid = fork()) < 0) {
         fprintf(stderr, "fork error\n");
         exit(1);
     }
     else if (pid == 0) {
-        execl(execName, "help", (char *)0);
+        execl(path, "help", (char *)0);
         exit(0);
     }
     else {
@@ -19,13 +22,16 @@ void helpExec() {
 
 void lsExec(char **argList) {
     pid_t pid;
+    char path[PATH_MAX] = "";
+    strcat(path, codePath);
+    strcat(path, execName);
 
     if ((pid = fork()) < 0) {
         fprintf(stderr, "fork error\n");
         exit(1);
     }
     else if (pid == 0) {
-        execv(execName, argList);
+        execv(path, argList);
         exit(0);
     }
     else {
