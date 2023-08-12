@@ -73,6 +73,7 @@ void cdExec(int argCnt, char **argList) {
         }
         getcwd(execPath, PATH_MAX);
     }
+    printf("\n");
 }
 
 void init() {
