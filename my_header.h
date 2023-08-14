@@ -16,25 +16,28 @@
 #define CMD_LS   0b0001000
 #define CMD_VIM  0b0010000
 #define CMD_CD   0b0100000
+#define CMD_CP   0b1000000
 
 char execPath[PATH_MAX];
 char homePath[PATH_MAX];
 char *codePath = "/Users/asm/code/sysp/makeShell/";
 char execName[PATH_MAX];
 
-char *commandList[7] = {
+char *commandList[8] = {
     "exit",
     "help",
     "pwd",
     "ls",
     "vim",
     "vi",
-    "cd"
+    "cd",
+    "cp"
 };
 
 void help();
 void ls(int, char **);
 void vim(int, char **);
+void cp(int, char **);
 
 char **divideString(char *str, int *cnt, char *del) {
     *cnt = 0;

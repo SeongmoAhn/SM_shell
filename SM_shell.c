@@ -37,6 +37,8 @@ void lsExec(char **argList) {
     else {
         pid = wait(NULL);
     }
+
+    printf("\n");
 }
 
 void vimExec(char **argList) {
@@ -55,6 +57,7 @@ void vimExec(char **argList) {
     else {
         pid = wait(NULL);
     }
+
     printf("\n");
 }
 
@@ -73,6 +76,25 @@ void cdExec(int argCnt, char **argList) {
         }
         getcwd(execPath, PATH_MAX);
     }
+
+    printf("\n");
+}
+
+void cpExec(int argCnt, char **argList) {
+    pid_t pid;
+
+    if ((pid = fork()) < 0) {
+        fprintf(stderr, "fork error\n");
+        exit(1);
+    }
+    else if (pid == 0) {
+        execv(execName, argList);
+        exit(0);
+    }
+    else {
+        pid = wait(NULL);
+    }
+
     printf("\n");
 }
 
@@ -116,6 +138,8 @@ void prompt() {
             command = CMD_VIM;
         } else if (!strcmp(argList[0], commandList[6])) { // cd
             command = CMD_CD;
+        } else if (!strcmp(argList[0], commandList[7])) { // cp
+            command = CMD_CP;
         }
         else command = NOT_CMD;
 
@@ -127,6 +151,8 @@ void prompt() {
             vimExec(argList);
         } else if (command & CMD_CD) {
             cdExec(argCnt, argList);
+        } else if (command & CMD_CP) {
+            cpExec(argCnt, argList);
         }
     }
 }
@@ -140,6 +166,8 @@ int main(int argc, char **argv) {
         help();
     } else if(!strcmp(argv[0], "ls")) {
         ls(argc, argv);
+    } else if (!strcmp(argv[0], "cp")) {
+        cp(argc, argv);
     }
     else prompt();
 

@@ -211,5 +211,4 @@ void ls(int argc, char **argv) {
     printFiles(opt);
 
     deleteNode();
-    printf("\n");
 }
