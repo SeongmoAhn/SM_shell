@@ -9,21 +9,22 @@
 #define STR_MAX 4096
 #define PATH_MAX 4096
 
-#define NOT_CMD  0b0000000
-#define CMD_EXIT 0b0000001
-#define CMD_HELP 0b0000010
-#define CMD_PWD  0b0000100
-#define CMD_LS   0b0001000
-#define CMD_VIM  0b0010000
-#define CMD_CD   0b0100000
-#define CMD_CP   0b1000000
+#define NOT_CMD  0b00000000000000000000000000000000
+#define CMD_EXIT 0b00000000000000000000000000000001
+#define CMD_HELP 0b00000000000000000000000000000010
+#define CMD_PWD  0b00000000000000000000000000000100
+#define CMD_LS   0b00000000000000000000000000001000
+#define CMD_VIM  0b00000000000000000000000000010000
+#define CMD_CD   0b00000000000000000000000000100000
+#define CMD_CP   0b00000000000000000000000001000000
+#define CMD_CAT  0b00000000000000000000000010000000
 
 char execPath[PATH_MAX];
 char homePath[PATH_MAX];
 char *codePath = "/Users/asm/code/sysp/makeShell/";
 char execName[PATH_MAX];
 
-char *commandList[8] = {
+char *commandList[9] = {
     "exit",
     "help",
     "pwd",
@@ -31,13 +32,15 @@ char *commandList[8] = {
     "vim",
     "vi",
     "cd",
-    "cp"
+    "cp",
+    "cat"
 };
 
 void help();
 void ls(int, char **);
 void vim(int, char **);
 void cp(int, char **);
+void cat(int, char **);
 
 char **divideString(char *str, int *cnt, char *del) {
     *cnt = 0;

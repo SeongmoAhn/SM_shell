@@ -98,6 +98,24 @@ void cpExec(int argCnt, char **argList) {
     printf("\n");
 }
 
+void catExec(int argCnt, char **argList) {
+    pid_t pid;
+
+    if ((pid = fork()) < 0) {
+        fprintf(stderr, "fork error\n");
+        exit(1);
+    }
+    else if (pid == 0) {
+        execv(execName, argList);
+        exit(0);
+    }
+    else {
+        pid = wait(NULL);
+    }
+
+    printf("\n");
+}
+
 void init() {
     getcwd(execPath, PATH_MAX);
     sprintf(homePath, "%s", getenv("HOME"));
@@ -140,6 +158,8 @@ void prompt() {
             command = CMD_CD;
         } else if (!strcmp(argList[0], commandList[7])) { // cp
             command = CMD_CP;
+        } else if (!strcmp(argList[0], commandList[8])) { // cat
+            command = CMD_CAT;
         }
         else command = NOT_CMD;
 
@@ -153,6 +173,8 @@ void prompt() {
             cdExec(argCnt, argList);
         } else if (command & CMD_CP) {
             cpExec(argCnt, argList);
+        } else if (command & CMD_CAT) {
+            catExec(argCnt, argList);
         }
     }
 }
@@ -168,6 +190,8 @@ int main(int argc, char **argv) {
         ls(argc, argv);
     } else if (!strcmp(argv[0], "cp")) {
         cp(argc, argv);
+    } else if (!strcmp(argv[0], "cat")) {
+        cat(argc, argv);
     }
     else prompt();
 
