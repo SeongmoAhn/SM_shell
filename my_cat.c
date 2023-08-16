@@ -31,5 +31,7 @@ void cat(int argc, char **argv) {
 
             write(STDOUT_FILENO, buf, length);
         }
+
+        close(fd);
     }
 }
